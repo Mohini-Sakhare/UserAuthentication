@@ -1,0 +1,145 @@
+import React, { useContext, useState } from 'react'
+import { IoEye } from "react-icons/io5";
+import { IoEyeOff } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+function Signup() {
+
+    const client = axios.create({
+     baseURL: 'http://localhost:5500/api/auth'
+ })
+
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [err, setErr]=useState('');
+
+  const [loading, setLoading]=useState(false)
+
+  //use navigation for move to the login page
+  const navigate = useNavigate();
+
+  const [inputValue, setInputValue]=useState({
+    email:"",
+    password: "",
+    username: "",
+  });
+  const { email, password, username } = inputValue;
+
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+    setInputValue({
+      ...inputValue,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErr('');
+    setLoading(true)
+    try {
+      const result = await client.post(
+        "/signup",
+        {
+          ...inputValue,
+        },
+        { withCredentials: true }
+      );
+     console.log(result.data)
+    //   const { success, message } = data;
+    //   if (success) {
+    //     handleSuccess(message);
+    //     setTimeout(() => {
+    //       navigate("/");
+    //     }, 1000);
+    //   } else {
+    //     handleError(message);
+    //   }
+    //   setUserData(data);
+      setLoading(false);
+    //   navigate("/customize")
+    } catch (error) {
+      console.log(error);
+    //   setUserData(null);
+      setErr(error.response.data.message)
+      setLoading(false)
+    }
+    setInputValue({
+      ...inputValue,
+      email: "",
+      password: "",
+      username: "",
+    });
+  };
+
+  return (
+    <div
+      className="w-full h-[100vh] bg-cover flex flex-col justify-center items-center pr-16 pt-5 bg-linear-30 bg-blue-800"
+    >
+     
+      <form onSubmit={handleSubmit} className="w-[50%] h-[500px] max-w-[450px] bg-[#00000085] 
+            shadow-lg shadow-black flex flex-col items-center justify-center gap-[20px] px-[30px] mt-12">
+        <h1 className="text-white text-[28px] font-bold mb-[10px]">
+          Sign Up 
+        </h1>
+
+        <input
+          type="text"
+          placeholder="Username"
+          className="w-full h-[50px] outline-none border-2 border-none bg-blue-950 shadow shadow-blue-400
+                     text-white text-[18px] placeholder-gray-300 px-[20px] py-[10px] rounded-full"
+          required name="username" value={username} onChange={handleOnChange} />
+
+        <input
+          type="email"
+          placeholder=" Email"
+          className="w-full h-[50px] outline-none border-2 border-none bg-blue-950 shadow shadow-blue-400
+                     text-white text-[18px] placeholder-gray-300 px-[20px] py-1.5 rounded-full"
+          required name="email" value={email} onChange={handleOnChange} />
+
+        <div className="w-full h-[50px] text-white text-[18px] border-none outline-none border-2 bg-blue-950
+                    shadow shadow-blue-400 rounded-full relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder=" Password "
+            className="w-full h-full outline-none border-2 border-none bg-blue-950 shadow shadow-blue-400
+             text-white text-[18px] placeholder-gray-300 px-[20px] py-1.5 rounded-full"
+            required name="password" value={password} onChange={handleOnChange} />{" "}
+          {!showPassword && (
+            <IoEye
+              onClick={() => setShowPassword(true)}
+              className="absolute top-[13px] right-[20px] w-[25px] h-[25px] cursor-pointer "
+            />
+          )}
+          {showPassword && (
+            <IoEyeOff
+              onClick={() => setShowPassword(false)}
+              className="absolute top-[13px] right-[20px] w-[25px] h-[25px] cursor-pointer "
+            />
+          )}
+        </div>
+        
+        {err.length>0 && <p className="text-rose-500 font-semibold text-xl">* {err}</p> }
+        
+
+        <button className="min-w-[150px] h-[60px] bg-cyan-300 rounded-2xl text-[19px] font-bold " disabled={loading}>
+          {loading?"Loading...":"Sign Up"}
+        </button>
+
+        <p className="text-white text-[18px]">
+          Already have an account?{" "}
+          <span
+            className="text-cyan-300 font-bold text-[20px] underline cursor-pointer"
+            onClick={() => navigate("/login")}
+          >
+            Login
+          </span>
+        </p>
+      </form>
+    </div>
+  )
+}
+
+export default Signup
