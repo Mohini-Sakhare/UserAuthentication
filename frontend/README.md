@@ -1,0 +1,1 @@
+create user Authentication pages i.e. Login and Sign Up using backend Mongodb, express, Node.js, React, bcrypt for password encryption and frontend html, Tailwind css, ReactJS.
